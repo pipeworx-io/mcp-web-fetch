@@ -1,12 +1,20 @@
 {
   "name": "@pipeworx/mcp-web-fetch",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "web-fetch — fetch ONE public URL live from its origin, verbatim.",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./tools.json": "./tools.json",
+    "./package.json": "./package.json"
+  },
   "bin": {
     "mcp-web-fetch": "bin/cli.js"
+  },
+  "files": ["bin/", "lib/", "tools.json", "server.json"],
+  "engines": {
+    "node": ">=18"
   },
   "keywords": ["mcp", "mcp-server", "model-context-protocol", "pipeworx", "web-fetch"],
   "license": "MIT",
@@ -14,19 +22,12 @@
     "type": "git",
     "url": "git+https://github.com/pipeworx-io/mcp-web-fetch.git"
   },
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "tsx": "^4.19.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.3",
-    "@cloudflare/workers-types": "^4.20260405.1"
-  },
+  "mcpName": "io.github.pipeworx-io/web-fetch",
   "pipeworx": {
-    "sourceHash": "v1-ba37a001ead87f0ff68302159d47a448d64f48272cb404b591ff9d5d333bd9b4",
-    "sourceCommit": "5749f83c0ea115fab4c0c0ef04b66b05f2507d67"
+    "mode": "gateway",
+    "slug": "web-fetch",
+    "gatewaySlug": "web-fetch",
+    "sourceHash": "v1-2291836ca3c5d642301d041a3187b5cb9a50a5be63e042b2518190ebb76fc172",
+    "sourceCommit": "98853f34516646cb7c4c1460f09249b262c0269e"
   }
 }
