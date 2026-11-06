@@ -1,6 +1,6 @@
 {
   "name": "@pipeworx/mcp-web-fetch",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "web-fetch — fetch ONE public URL live from its origin, verbatim.",
   "type": "module",
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
     "mode": "gateway",
     "slug": "web-fetch",
     "gatewaySlug": "web-fetch",
-    "sourceHash": "v1-2291836ca3c5d642301d041a3187b5cb9a50a5be63e042b2518190ebb76fc172",
-    "sourceCommit": "98853f34516646cb7c4c1460f09249b262c0269e"
+    "sourceHash": "v1-64eb3f864b90b5949b07b6bc2717b9565dbe86aa840ed9f2ceeb5a7294b0647f",
+    "sourceCommit": "78b905fa3a6880dfb85c79150f4bffe8cf50ef00"
   }
 }

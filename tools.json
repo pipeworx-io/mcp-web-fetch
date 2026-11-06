@@ -31,5 +31,42 @@
         "url"
       ]
     }
+  },
+  {
+    "name": "extract_archive_member",
+    "description": "List or extract a named member from a ZIP archive at a public URL, without downloading the whole archive when the origin honours HTTP Range (most do, including Internet Archive Wayback Machine captures). Call with just \"url\" to LIST members: name, compressed/uncompressed size, method (stored/deflate), CRC-32. Add \"member\" (the exact or case-insensitive name from that list) to EXTRACT it: text members come back as decoded text, binary members as base64, windowed by max_bytes/offset exactly like fetch_url. Reads only the end-of-central-directory record and the central directory (at the tail of the file) to list members, and only the one member's local header + payload to extract it — a multi-GB archive costs the same few requests as a tiny one. Refusals are explicit and named: member_not_found, encrypted_entry, unsupported_compression_method (only stored and deflate), decompressed_too_large (checked BEFORE decompressing against the declared size, and again DURING decompression independent of what was declared — a zip-bomb defence that cannot be defeated by a false declaration), zip64_not_supported (more than 65,535 entries or a 4GB+ central directory), too_large (Range not honoured and the archive exceeds this tool's read cap), invalid_archive (not a ZIP, or corrupt). Keyless; works on any ZIP at any public URL, not just an archived capture.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The absolute http(s) URL of a ZIP archive, e.g. an Internet Archive Wayback Machine capture of a .zip, an object-store URL, or any direct ZIP download link."
+        },
+        "member": {
+          "type": "string",
+          "description": "The exact (or case-insensitive) name of the archive member to extract, as returned by a prior call without \"member\". Omit to list members instead."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "raw",
+            "text"
+          ],
+          "description": "Only used when extracting a member. auto (default) and raw both return decoded text for a textual member and base64 for binary; text forces a text decode (falls back to base64 with a warning if the member looks binary)."
+        },
+        "max_bytes": {
+          "type": "number",
+          "description": "Only used when extracting a member: size of the returned window. Default 100000. Maximum 1000000 for text, 512000 for base64 (binary)."
+        },
+        "offset": {
+          "type": "number",
+          "description": "Only used when extracting a member: byte offset into the DECOMPRESSED member where the window starts. Use next_offset from the previous call to page. Default 0."
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
   }
 ]

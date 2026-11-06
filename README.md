@@ -2,9 +2,11 @@
 
 Fetch the exact contents of one public URL, live from its origin server, and
 get back the bytes (or text decoded from them) with a SHA-256 hash of exactly
-what the origin sent, plus the redirect chain and the response headers.
+what the origin sent, plus the redirect chain and the response headers. Also
+lists and extracts named members from a ZIP archive at a public URL, without
+downloading the whole archive when the origin honours HTTP Range.
 
-Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents to 1857+ live data sources. This is an independent, unofficial integration — not affiliated with, endorsed by, or published by the upstream provider.
+Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents to 1867+ live data sources. This is an independent, unofficial integration — not affiliated with, endorsed by, or published by the upstream provider.
 
 ## Tools
 
@@ -30,6 +32,43 @@ Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents 
   declaration, then UTF-8 if the bytes are valid UTF-8, else windows-1252.
   `charset_source` says which rule decided and `decode_replacements` counts any
   characters lost in decoding (0 means none).
+
+- `extract_archive_member(url, member?, format?, max_bytes?, offset?)` — list
+  or extract a named member from a ZIP archive at `url`.
+  - No `member`: lists members — `name`, `compressed_size`, `uncompressed_size`,
+    `method` (`stored` | `deflate` | `method_N`), `crc32`, `local_header_offset`,
+    `encrypted`. `members_truncated` says if there were more than
+    `members_returned`.
+  - With `member` (exact name, falling back to a case-insensitive match —
+    `matched_by` says which): decompresses that one entry and returns it —
+    `format: "auto"`/`"raw"` give decoded text for a textual member and base64
+    for binary; `"text"` forces a text decode (falls back to base64 with a
+    warning if the member looks binary). Windowed by `max_bytes`/`offset`
+    exactly like `fetch_url`, over the DECOMPRESSED bytes. `crc32_verified`
+    confirms the decompressed bytes match the archive's own checksum.
+  - Reads only the end-of-central-directory record and the central directory
+    — at the tail of the file — to list members, and only the wanted member's
+    local header + payload to extract it, all via HTTP Range. A multi-GB
+    archive costs the same few requests as a tiny one, as long as the origin
+    honours Range (most do, including Internet Archive Wayback Machine
+    captures); otherwise it
+    falls back to a capped full download (`range_supported: false`).
+  - Zip-bomb protection is two independent layers: the central directory's
+    declared uncompressed size is checked against the cap BEFORE any byte is
+    decompressed, and the real decompressed byte count is ALSO capped DURING
+    decompression — so a member that lies about its own declared size is
+    still caught. Encrypted entries, unsupported compression methods (only
+    stored and deflate), and archives whose own end-of-central-directory
+    record is ZIP64 (more than 65,535 entries, or a 4GB+ central directory)
+    are refused by name rather than mis-read.
+  - Refusals: `member_not_found`, `encrypted_entry`,
+    `unsupported_compression_method`, `decompressed_too_large` (checked both
+    before and during decompression — see above), `too_many_members`,
+    `directory_too_large`, `zip64_not_supported`, `too_large` (Range not
+    honoured and the archive exceeds the read cap), `invalid_archive` (not a
+    ZIP, or corrupt), plus `fetch_url`'s own `blocked_url` /
+    `upstream_refused` / `upstream_down` / `budget_exhausted` for reaching the
+    URL in the first place.
 
 ### Checking "verbatim" yourself
 
@@ -121,7 +160,7 @@ directly, instead of just this one's:
 }
 ```
 
-Both URLs reach the same gateway and the same 1857+ data sources. The
+Both URLs reach the same gateway and the same 1867+ data sources. The
 only difference is which pack's tools are listed **directly**; `ask_pipeworx`
 reaches all of them from either one.
 
